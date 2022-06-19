@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 
+import 'login_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
   late DatabaseReference _databaseReference;
 
   void getTimer() {
-    Timer(const Duration(seconds: 5), finished);
+    Timer(const Duration(seconds: 4), finished);
   }
 
   Future<String> getLatitude(DatabaseReference ref) async {
@@ -43,11 +45,11 @@ class _SplashScreenState extends State<SplashScreen> {
     String lat = await getLatitude(_databaseReference);
     String lon = await getLongitute(_databaseReference);
     // ignore: use_build_context_synchronously
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>  GmapScreen(lat,lon),
-        ));
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return FirebaseAuth.instance.currentUser != null
+          ? GmapScreen(lat, lon)
+          : LoginScreen(lat, lon);
+    }));
   }
 
   @override
@@ -75,7 +77,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Container(
           alignment: Alignment.center,
           child: Image(
-            image:const AssetImage('images/car.jpg'),
+            image: const AssetImage('images/car.jpg'),
             width: MediaQuery.of(context).size.width * 0.8,
           ),
         ),
